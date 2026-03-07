@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}Register - CSAS{% endblock %}
+{% block content %}
+<section class="form-section">
+  <h1>Register</h1>
+  <p>University credentials only (FR-01).</p>
+  <form method="post" action="/api/auth/register" class="auth-form" id="register-form">
+    <label for="email">Institutional Email</label>
+    <input id="email" name="email" type="email" required autocomplete="email">
+    <label for="university_id">University ID</label>
+    <input id="university_id" name="university_id" type="text" required autocomplete="off">
+    <label for="password">Password</label>
+    <input id="password" name="password" type="password" required autocomplete="new-password">
+    <button type="submit" class="btn btn-primary">Register</button>
+  </form>
+  <p><a href="/login">Login</a></p>
+</section>
+{% endblock %}
+{% block scripts %}
+<script>
+  document.getElementById('register-form').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const form = this;
+    fetch(form.action, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify({
+        email: form.email.value,
+        university_id: form.university_id.value,
+        password: form.password.value
+      })
+    })
+      .then(r => r.json())
+      .then(d => {
+        if (d.id) { window.location.href = '/login'; }
+        else { alert(d.detail || 'Registration failed'); }
+      })
+      .catch(() => alert('Registration failed'));
+  });
+</script>
+{% endblock %}

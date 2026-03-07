@@ -1,0 +1,304 @@
+﻿
+CAMPUS SECURITY ALERT SYSTEM
+System Requirements Specification (SRS)
+
+
+Project
+Campus Security Alert System
+Group
+Group 19
+Module
+PBDV / PBDE
+Document Version
+v1.0
+Date
+March 2026
+Status
+Approved for Development
+
+This document has been reviewed and approved for development.
+
+1. Introduction
+1.1 Purpose
+This System Requirements Specification (SRS) defines the functional, security, performance, and user-experience requirements for the Campus Security Alert System (CSAS). The system is a web-based application designed to deliver reliable, real-time security alerts and incident management capabilities to all campus stakeholders.
+
+1.2 Project Overview
+The Campus Security Alert System provides a centralized platform enabling:
+University students, staff, and security personnel to receive instant, categorized alerts during campus emergencies.
+Security administrators to broadcast incidents, manage user roles, and monitor security patterns via dashboards.
+Secure, authenticated access using existing university credentials with role-based permissions.
+Comprehensive logging of all incidents, alerts, and user-reported concerns for operational analysis.
+
+1.3 Scope
+The system will be delivered as a responsive web application accessible on desktop and mobile browsers. It will interface with university authentication services and provide browser-based push notifications. Core modules include: user authentication, alert broadcasting, incident management, role-based access control, and analytics dashboards.
+
+1.4 Definitions & Abbreviations
+CSAS
+Campus Security Alert System
+SRS
+System Requirements Specification
+RBAC
+Role-Based Access Control
+SLA
+Service Level Agreement
+2FA
+Two-Factor Authentication
+OWASP
+Open Web Application Security Project
+GDPR
+General Data Protection Regulation
+
+2. Functional Requirements
+2.1 User Registration & Authentication
+The system must provide secure, credential-based access with granular role management.
+
+ID
+Requirement
+Priority
+Category
+FR-01
+Users must register and log in exclusively using valid university credentials (student/staff ID and institutional email).
+Critical
+Authentication
+FR-02
+The system must support Single Sign-On (SSO) integration with the university identity provider.
+Critical
+Authentication
+FR-03
+Role-based access control must distinguish between: Student, Staff, Security Officer, and Administrator roles.
+Critical
+RBAC
+FR-04
+Administrators must be able to assign, modify, and revoke user roles via a management interface.
+High
+RBAC
+FR-05
+Sessions must automatically expire after a configurable period of inactivity (default: 30 minutes).
+High
+Session Mgmt
+FR-06
+The system must support optional Two-Factor Authentication (2FA) for security personnel and administrators.
+High
+Authentication
+FR-07
+All failed login attempts must be logged with timestamp, IP address, and account identifier.
+High
+Audit
+
+2.2 Alert Broadcasting & Incident Management
+Alerts must be delivered reliably, instantly, and with precise categorisation to prevent confusion during emergencies.
+
+ID
+Requirement
+Priority
+Category
+FR-08
+Authorised users (Security Officers, Admins) must be able to create and broadcast alerts to all or specific user groups.
+Critical
+Alerts
+FR-09
+Each alert must be categorised by: Severity (Critical / High / Medium / Low), Location (campus zone/building), and Incident Type (fire, medical, security threat, etc.).
+Critical
+Alerts
+FR-10
+Alert delivery must be confirmed within 5 seconds of broadcast to all connected users.
+Critical
+Performance
+FR-11
+Browser push notifications must be delivered to all subscribed users, including those not actively using the app.
+Critical
+Notifications
+FR-12
+Users must be able to report incidents directly through the application; reports must notify security personnel immediately.
+High
+Reporting
+FR-13
+The system must support alert prioritization so that Critical alerts pre-empt lower-priority notifications.
+High
+Alerts
+FR-14
+Alerts must remain accessible in a historical feed for at least 90 days.
+Medium
+Data Retention
+
+2.3 Security & Data Protection
+The system must implement industry-standard security controls to protect sensitive student, staff, and operational data.
+
+ID
+Requirement
+Priority
+Category
+FR-15
+All passwords must be hashed using bcrypt (minimum cost factor 12) or equivalent secure algorithm; plaintext passwords must never be stored.
+Critical
+Security
+FR-16
+All input fields must be validated and sanitised server-side to prevent SQL injection, XSS, and CSRF attacks.
+Critical
+Security
+FR-17
+All data in transit must be encrypted using TLS 1.2 or higher.
+Critical
+Security
+FR-18
+Sensitive data at rest (PII, credentials) must be encrypted using AES-256 or equivalent.
+Critical
+Security
+FR-19
+The application must implement OWASP Top 10 mitigations across all endpoints.
+High
+Security
+FR-20
+API endpoints must enforce authentication tokens (JWT or OAuth 2.0) for all protected resources.
+High
+Security
+FR-21
+Rate limiting must be applied to login and alert endpoints to prevent brute-force and DoS attacks.
+High
+Security
+
+2.4 Logging, Audit & Analytics Dashboard
+All system activity must be logged systematically; dashboards must empower security personnel and administrators to track patterns and make informed decisions.
+
+ID
+Requirement
+Priority
+Category
+FR-22
+All incidents, alert broadcasts, and user-reported concerns must be logged with timestamp, actor, and action details.
+Critical
+Logging
+FR-23
+An immutable audit log must record all administrative actions (role changes, deletions, system config changes).
+High
+Audit
+FR-24
+The analytics dashboard must display real-time and historical metrics: alert frequency, high-risk zones, response times, and incident types.
+High
+Dashboard
+FR-25
+Security personnel must be able to filter, search, and export log data by date range, severity, location, and type.
+High
+Dashboard
+FR-26
+The system must generate automated reports (daily/weekly/monthly) summarising campus security activity for administrators.
+Medium
+Reporting
+FR-27
+Heat-map or geographic visualisation of high-risk areas must be available on the dashboard.
+Medium
+Dashboard
+
+2.5 User Experience & Interface
+
+ID
+Requirement
+Priority
+Category
+FR-28
+The application must be fully responsive and function correctly on desktop (1024px+), tablet, and mobile (320px+) screen sizes.
+Critical
+UI/UX
+FR-29
+The interface must be intuitive, minimising the number of steps required to broadcast an alert or report an incident.
+High
+UI/UX
+FR-30
+Critical alert notifications must be visually distinct (colour-coded, audible cue) from lower-priority messages.
+High
+UI/UX
+FR-31
+All key actions must be reachable within 3 clicks/taps from the home screen.
+Medium
+UI/UX
+FR-32
+The system must comply with WCAG 2.1 Level AA accessibility standards.
+Medium
+Accessibility
+
+3. Non-Functional Requirements
+3.1 Performance
+Alert broadcast latency must not exceed 5 seconds under normal load conditions.
+The system must support a minimum of 5,000 concurrent users without performance degradation.
+Page load time must not exceed 3 seconds on a standard campus network connection.
+API response times must remain under 500ms for 95% of requests.
+
+3.2 Reliability & Availability
+System uptime must meet a minimum SLA of 99.5% during term time.
+Automatic failover mechanisms must be in place to maintain availability during partial infrastructure failures.
+The notification delivery pipeline must include retry logic with exponential backoff.
+
+3.3 Scalability
+The system architecture must support horizontal scaling to accommodate increased load during major campus events.
+Database design must support efficient querying as log volume grows beyond 1 million records.
+
+3.4 Security
+Penetration testing must be conducted before production deployment.
+Security patches must be applied within 72 hours of critical vulnerability disclosure.
+The system must comply with applicable data protection regulations (e.g., POPIA, GDPR).
+
+4. Testing Requirements
+The following test scenarios must be completed and signed off prior to production release:
+
+4.1 Browser Notification Testing
+Verify push notifications are received on Chrome, Firefox, Safari, and Edge.
+Test notification delivery when the app is running in the background or the browser tab is closed.
+Confirm notifications arrive within the 5-second SLA under normal load.
+
+4.2 Alert Prioritisation Testing
+Verify that Critical alerts visually and audibly override Medium/Low notifications.
+Confirm alert queue ordering is preserved under simultaneous multi-alert conditions.
+
+4.3 Multi-Device Responsiveness Testing
+Test all core user journeys on iOS Safari, Android Chrome, and desktop browsers.
+Validate layout integrity at 320px, 768px, and 1440px viewport widths.
+Confirm real-time alert receipt on all tested device/browser combinations.
+
+4.4 Security Testing
+Conduct automated vulnerability scanning (OWASP ZAP or equivalent).
+Test authentication bypass, session fixation, and privilege escalation scenarios.
+Verify input validation against OWASP injection test cases.
+
+5. System Architecture Overview
+The Campus Security Alert System follows a three-tier web architecture:
+
+Layer
+Components
+Technologies (Suggested)
+Presentation
+Responsive web UI, alert widgets, dashboards, notification banners
+React / Vue.js, Tailwind CSS, Service Workers
+Application
+Auth service, alert engine, RBAC middleware, logging service, notification dispatcher
+Node.js / Python (Django/FastAPI), WebSockets
+Data
+User data, incident logs, audit trail, alert history
+PostgreSQL, Redis (caching/queues)
+
+5.1 Key Architectural Decisions
+WebSockets or Server-Sent Events must be used for real-time alert delivery to connected clients.
+A message queue (e.g., Redis Pub/Sub or RabbitMQ) must decouple alert broadcasting from the web server to ensure reliability under load.
+All environment secrets (database credentials, API keys, JWT secrets) must be managed via environment variables or a secrets manager; they must never be hardcoded.
+
+6. Approval & Sign-Off
+The proposal for the Campus Security Alert System has been reviewed and approved for development, subject to addressing all critical requirements defined in this document.
+
+Approval Status
+Approved â€” Proceed with Development
+Key Focus Areas
+Security, Reliability, User Experience
+Next Milestone
+Prototype / Proof of Concept Demo
+Constraints
+Web-based delivery; university credential integration required
+
+Role
+Signature / Acknowledgement
+Project Supervisor
+___________________________
+Group 19 Representative
+___________________________
+Security Module Lead
+___________________________
+
+Campus Security Alert System â€” System Requirements Specification v1.0 â€” Group 19 â€” March 2026

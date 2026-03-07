@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block title %}Dashboard - CSAS{% endblock %}
+{% block content %}
+<section class="page-header">
+  <h1>Analytics Dashboard</h1>
+  <p>Metrics and heat-map data (FR-24, FR-27).</p>
+</section>
+<div id="metrics" class="metrics"></div>
+<div id="heatmap" class="heatmap">
+  <h2>High-risk locations (last 30 days)</h2>
+  <div id="heatmap-list"></div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+  (function() {
+    const token = localStorage.getItem('token');
+    if (!token) { window.location.href = '/login'; return; }
+    const h = { 'Authorization': 'Bearer ' + token };
+    fetch('/api/dashboard/metrics?days=30', { headers: h }).then(r => r.json()).then(m => {
+      document.getElementById('metrics').innerHTML = `
+        <div class="metric-card"><strong>Alerts (30d)</strong> ${m.alerts_total}</div>
+        <div class="metric-card"><strong>Incidents (30d)</strong> ${m.incidents_total}</div>
+        <div class="metric-card"><strong>By severity</strong> ${JSON.stringify(m.alerts_by_severity)}</div>
+      `;
+    });
+    fetch('/api/dashboard/heatmap?days=30', { headers: h }).then(r => r.json()).then(d => {
+      const list = document.getElementById('heatmap-list');
+      list.innerHTML = (d.locations || []).map(l => `<div class="heat-item">${escapeHtml(l.name)}: ${l.count}</div>`).join('') || '<p>No data.</p>';
+    });
+    function escapeHtml(s) { const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+  })();
+</script>
+{% endblock %}

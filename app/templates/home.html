@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}Home - CSAS{% endblock %}
+{% block content %}
+<section class="hero">
+  <h1>Campus Security Alert System</h1>
+  <p>Real-time security alerts and incident reporting for campus.</p>
+  <p><a href="/alerts" class="btn btn-primary">View Alerts</a> <a href="/report" class="btn">Report Incident</a>
+  <a href="/login" class="btn">Login</a> <a href="/register" class="btn">Register</a></p>
+</section>
+<div id="alert-feed" class="alert-feed">
+  <h2>Recent Alerts</h2>
+  <div id="alert-list"></div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+  (function() {
+    const list = document.getElementById('alert-list');
+    fetch('/api/alerts').then(r => r.json()).then(alerts => {
+      if (!alerts.length) { list.innerHTML = '<p>No alerts.</p>'; return; }
+      list.innerHTML = alerts.slice(0, 5).map(a => `
+        <article class="alert-card severity-${a.severity}" role="alert">
+          <strong>${escapeHtml(a.title)}</strong>
+          <span class="meta">${a.severity} ${a.location || ''} &mdash; ${a.created_at ? new Date(a.created_at).toLocaleString() : ''}</span>
+          ${a.body ? '<p>' + escapeHtml(a.body) + '</p>' : ''}
+        </article>
+      `).join('');
+    }).catch(() => { list.innerHTML = '<p>Could not load alerts.</p>'; });
+    function escapeHtml(s) {
+      const div = document.createElement('div');
+      div.textContent = s;
+      return div.innerHTML;
+    }
+  })();
+</script>
+{% endblock %}

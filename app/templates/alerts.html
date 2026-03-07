@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}Alerts - CSAS{% endblock %}
+{% block content %}
+<section class="page-header">
+  <h1>Security Alerts</h1>
+  <p>Sorted by severity (Critical first). 90-day history (FR-14).</p>
+</section>
+<div id="alert-list" class="alert-list"></div>
+{% endblock %}
+{% block scripts %}
+<script>
+  (function() {
+    const list = document.getElementById('alert-list');
+    const token = localStorage.getItem('token');
+    const opts = token ? { headers: { 'Authorization': 'Bearer ' + token } } : {};
+    fetch('/api/alerts', opts).then(r => r.json()).then(alerts => {
+      if (!alerts.length) { list.innerHTML = '<p>No alerts.</p>'; return; }
+      list.innerHTML = alerts.map(a => `
+        <article class="alert-card severity-${a.severity}" role="alert" aria-label="Alert: ${escapeHtml(a.title)}">
+          <h3>${escapeHtml(a.title)}</h3>
+          <span class="meta">${a.severity} ${a.location || ''} &mdash; ${a.created_at ? new Date(a.created_at).toLocaleString() : ''}</span>
+          ${a.body ? '<p>' + escapeHtml(a.body) + '</p>' : ''}
+        </article>
+      `).join('');
+    }).catch(() => { list.innerHTML = '<p>Could not load alerts.</p>'; });
+    function escapeHtml(s) {
+      const div = document.createElement('div');
+      div.textContent = s;
+      return div.innerHTML;
+    }
+  })();
+</script>
+{% endblock %}

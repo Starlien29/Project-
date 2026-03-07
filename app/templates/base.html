@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}Campus Security Alert System{% endblock %}</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+  <header class="header">
+    <nav class="nav" role="navigation">
+      <a href="/" class="brand">CSAS</a>
+      <ul class="nav-list">
+        <li><a href="/">Home</a></li>
+        <li><a href="/alerts">Alerts</a></li>
+        <li><a href="/report">Report Incident</a></li>
+        <li><a href="/incidents">My Reports</a></li>
+        <li><a href="/dashboard">Dashboard</a></li>
+        <li><a href="/broadcast">Broadcast Alert</a></li>
+        <li><a href="/admin">Admin</a></li>
+        <li><a href="/login">Login</a></li>
+        <li><a href="/register">Register</a></li>
+      </ul>
+    </nav>
+  </header>
+  <main class="main" role="main" id="main-content">
+    {% block content %}{% endblock %}
+  </main>
+  <footer class="footer">
+    <p>Campus Security Alert System &mdash; Key actions within 3 clicks (FR-31)</p>
+  </footer>
+  {% block scripts %}{% endblock %}
+</body>
+</html>

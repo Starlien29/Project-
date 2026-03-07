@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}Incident Reports - CSAS{% endblock %}
+{% block content %}
+<section class="page-header">
+  <h1>Incident Reports</h1>
+  <p><a href="/report">Report an incident</a></p>
+</section>
+<div id="incident-list" class="alert-list"></div>
+{% endblock %}
+{% block scripts %}
+<script>
+  (function() {
+    const token = localStorage.getItem('token');
+    if (!token) { window.location.href = '/login'; return; }
+    fetch('/api/incidents', { headers: { 'Authorization': 'Bearer ' + token } })
+      .then(r => r.json())
+      .then(list => {
+        const el = document.getElementById('incident-list');
+        if (!list.length) { el.innerHTML = '<p>No reports.</p>'; return; }
+        el.innerHTML = list.map(i => `
+          <article class="alert-card severity-${i.severity}">
+            <p>${escapeHtml(i.description)}</p>
+            <span class="meta">${i.location || ''} &mdash; ${i.status} &mdash; ${i.created_at ? new Date(i.created_at).toLocaleString() : ''}</span>
+          </article>
+        `).join('');
+      });
+    function escapeHtml(s) { const d = document.createElement('div'); d.textContent = s || ''; return d.innerHTML; }
+  })();
+</script>
+{% endblock %}

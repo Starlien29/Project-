@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block title %}Broadcast Alert - CSAS{% endblock %}
+{% block content %}
+<section class="form-section">
+  <h1>Broadcast Alert</h1>
+  <p>Security Officer / Administrator only (FR-08). Minimal steps (FR-29).</p>
+  <form id="broadcast-form" class="auth-form">
+    <label for="title">Title *</label>
+    <input id="title" name="title" type="text" required>
+    <label for="body">Message</label>
+    <textarea id="body" name="body" rows="3"></textarea>
+    <label for="severity">Severity</label>
+    <select id="severity" name="severity">
+      <option value="critical">Critical</option>
+      <option value="high">High</option>
+      <option value="medium" selected>Medium</option>
+      <option value="low">Low</option>
+    </select>
+    <label for="location">Location (zone/building)</label>
+    <input id="location" name="location" type="text">
+    <label for="incident_type">Incident type</label>
+    <select id="incident_type" name="incident_type">
+      <option value="fire">Fire</option>
+      <option value="medical">Medical</option>
+      <option value="security_threat">Security threat</option>
+      <option value="weather">Weather</option>
+      <option value="other">Other</option>
+    </select>
+    <label for="audience">Audience</label>
+    <select id="audience" name="audience">
+      <option value="all">All users</option>
+    </select>
+    <button type="submit" class="btn btn-primary">Broadcast Alert</button>
+  </form>
+</section>
+{% endblock %}
+{% block scripts %}
+<script>
+  document.getElementById('broadcast-form').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const token = localStorage.getItem('token');
+    if (!token) { window.location.href = '/login'; return; }
+    fetch('/api/alerts', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+      body: JSON.stringify({
+        title: document.getElementById('title').value,
+        body: document.getElementById('body').value || null,
+        severity: document.getElementById('severity').value,
+        location: document.getElementById('location').value || null,
+        incident_type: document.getElementById('incident_type').value,
+        audience: document.getElementById('audience').value || 'all'
+      })
+    })
+      .then(r => r.json().then(d => ({ ok: r.ok, body: d })))
+      .then(({ ok, body }) => {
+        if (ok && body.id) { alert('Alert broadcast.'); window.location.href = '/alerts'; }
+        else { alert(body.detail || 'Failed'); }
+      })
+      .catch(() => alert('Failed'));
+  });
+</script>
+{% endblock %}

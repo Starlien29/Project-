@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block title %}Report Incident - CSAS{% endblock %}
+{% block content %}
+<section class="form-section">
+  <h1>Report Incident</h1>
+  <p>Your report will notify security personnel immediately (FR-12).</p>
+  <form id="report-form" class="auth-form">
+    <label for="description">Description *</label>
+    <textarea id="description" name="description" required rows="4"></textarea>
+    <label for="location">Location (building/zone)</label>
+    <input id="location" name="location" type="text">
+    <label for="severity">Severity</label>
+    <select id="severity" name="severity">
+      <option value="low">Low</option>
+      <option value="medium" selected>Medium</option>
+      <option value="high">High</option>
+      <option value="critical">Critical</option>
+    </select>
+    <button type="submit" class="btn btn-primary">Submit Report</button>
+  </form>
+</section>
+{% endblock %}
+{% block scripts %}
+<script>
+  document.getElementById('report-form').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const token = localStorage.getItem('token');
+    if (!token) { window.location.href = '/login'; return; }
+    fetch('/api/incidents', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+      body: JSON.stringify({
+        description: document.getElementById('description').value,
+        location: document.getElementById('location').value || null,
+        severity: document.getElementById('severity').value
+      })
+    })
+      .then(r => r.json())
+      .then(d => { if (d.id) { alert('Report submitted.'); window.location.href = '/'; } else { alert(d.detail || 'Failed'); } })
+      .catch(() => alert('Failed'));
+  });
+</script>
+{% endblock %}

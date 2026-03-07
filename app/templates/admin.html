@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block title %}Admin - CSAS{% endblock %}
+{% block content %}
+<section class="page-header">
+  <h1>Admin</h1>
+  <p>User and role management (FR-04). Audit log (FR-25).</p>
+</section>
+<h2>Users</h2>
+<div id="user-list"></div>
+<h2>Audit log</h2>
+<div id="audit-list"></div>
+<p><button id="export-csv">Export audit CSV</button></p>
+{% endblock %}
+{% block scripts %}
+<script>
+  (function() {
+    const token = localStorage.getItem('token');
+    if (!token) { window.location.href = '/login'; return; }
+    const h = { 'Authorization': 'Bearer ' + token };
+    fetch('/api/admin/users', { headers: h }).then(r => r.json()).then(users => {
+      document.getElementById('user-list').innerHTML = users.map(u => `
+        <div class="user-row">
+          ${u.email} (${u.university_id}) &mdash; ${u.role}
+          <select data-user-id="${u.id}" class="role-select">
+            <option value="student" ${u.role==='student'?'selected':''}>Student</option>
+            <option value="staff" ${u.role==='staff'?'selected':''}>Staff</option>
+            <option value="security_officer" ${u.role==='security_officer'?'selected':''}>Security Officer</option>
+            <option value="administrator" ${u.role==='administrator'?'selected':''}>Administrator</option>
+          </select>
+        </div>
+      `).join('');
+      document.querySelectorAll('.role-select').forEach(el => {
+        el.addEventListener('change', function() {
+          fetch('/api/admin/users/' + this.dataset.userId + '/role', {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+            body: JSON.stringify({ role: this.value })
+          }).then(() => location.reload());
+        });
+      });
+    });
+    fetch('/api/admin/audit?limit=50', { headers: h }).then(r => r.json()).then(logs => {
+      document.getElementById('audit-list').innerHTML = '<pre>' + logs.map(l => l.timestamp + ' ' + l.action + ' ' + (l.details || '')).join('\n') + '</pre>';
+    });
+    document.getElementById('export-csv').addEventListener('click', function() {
+      fetch('/api/dashboard/audit/export?format=csv', { headers: h })
+        .then(r => r.blob()).then(blob => {
+          const a = document.createElement('a');
+          a.href = URL.createObjectURL(blob);
+          a.download = 'audit_export.csv';
+          a.click();
+        });
+    });
+  })();
+</script>
+{% endblock %}
