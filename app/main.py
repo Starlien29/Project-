@@ -1,6 +1,4 @@
 """CSAS FastAPI application entry point."""
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=8000)
     
 from contextlib import asynccontextmanager
 from pathlib import Path
@@ -68,6 +66,10 @@ app.include_router(admin.router, prefix="/api/admin", tags=["admin"])
 app.include_router(dashboard.router, prefix="/api/dashboard", tags=["dashboard"])
 
 
+from fastapi import FastAPI
+
+app = FastAPI()
+
 @app.get("/")
 def root():
-    return {"app": settings.app_name, "docs": "/docs"}
+    return {"message": "Campus Security Alert Running!"}
